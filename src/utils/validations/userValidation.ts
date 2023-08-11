@@ -3,10 +3,10 @@
  * @description :: validate each post and put request as per user model
  */
 
-const joi = require('joi');
+import joi from "joi";
 
 /** validation keys and properties of user */
-exports.schemaKeys = joi.object({
+export const signInSchema = joi.object({
   username: joi.string().allow(null).allow(''),
   password: joi.string().allow(null).allow(''),
   email: joi.string().allow(null).allow(''),
@@ -16,3 +16,5 @@ exports.schemaKeys = joi.object({
   isDeleted: joi.boolean(),
   mobileNo: joi.string().allow(null).allow(''),
 }).unknown(true);
+
+

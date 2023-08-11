@@ -1,11 +1,10 @@
 import { Request, Response } from "express";
 import User from "../../models/user";
-import userSchemaKey from "../../utils/validations/userValidation";
 import validation from "../../utils/validateRequest";
 import dbService from "../../services/dbService";
 import { IResponse } from "../../interfaces/response";
 
-const add = async (req: any, res: any) => {
+const add = async (req: any, res: IResponse) => {
   try {
     let params: any = { ...req.body };
 
@@ -23,15 +22,8 @@ const add = async (req: any, res: any) => {
     // }
     params = new User(params);
     let user = await dbService.create(User, params);
-
-    console.log("====================================");
-    console.log("user", user);
-    console.log("====================================");
     return res.success({ data: user });
   } catch (error: any) {
-    console.log("====================================");
-    console.log("error", error);
-    console.log("====================================");
     return res.internalServerError({ message: error?.message });
   }
 };
