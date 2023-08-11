@@ -3,10 +3,9 @@
  * @param {Object} obj : object to be converted
  * @return {Array} : converted Array
  */
-function convertObjectToEnum (obj) {
-  const enumArr = [];
-  Object.values(obj).map((val) => enumArr.push(val));
+function convertObjectToEnum<T>(obj: Record<string, T>): T[] {
+  const enumArr: T[] = Object.values(obj);
   return enumArr;
 }
 
-module.exports = { convertObjectToEnum };
+export default { convertObjectToEnum };
