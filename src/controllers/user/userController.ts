@@ -4,7 +4,7 @@ import validation from "../../utils/validateRequest";
 import dbService from "../../services/dbService";
 import { IResponse } from "../../interfaces/response";
 
-const add = async (req: any, res: IResponse) => {
+const add = async (req: any, res: any) => {
   try {
     let params: any = { ...req.body };
 
