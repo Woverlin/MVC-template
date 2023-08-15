@@ -3,14 +3,14 @@
  * @description :: model of a database collection user
  */
 
-import mongoose, { Schema, Document, Model } from 'mongoose';
+import mongoose, { Schema, Document, Model } from "mongoose";
 
 export interface IUser extends Document {
   username: string;
   password: string;
   email: string;
   name: string;
-  userType: number;
+  role: number;
   isActive: boolean;
   isDeleted: boolean;
   createdAt: Date;
@@ -23,7 +23,7 @@ const userSchema: Schema = new Schema(
     password: { type: String },
     email: { type: String },
     name: { type: String },
-    userType: {
+    role: {
       type: String,
       required: true,
     },
@@ -31,6 +31,7 @@ const userSchema: Schema = new Schema(
       type: Boolean,
       default: true,
     },
+
     isDeleted: {
       type: Boolean,
       default: false,
@@ -44,10 +45,10 @@ const userSchema: Schema = new Schema(
   }
 );
 
-userSchema.pre<IUser>('save', async function (next) {
+userSchema.pre<IUser>("save", async function (next) {
   // any logic before saving the document
   next();
 });
 
-const User: Model<IUser> = mongoose.model<IUser>('users', userSchema);
+const User: Model<IUser> = mongoose.model<IUser>("users", userSchema);
 export default User;

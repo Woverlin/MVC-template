@@ -64,6 +64,14 @@ const findById = (collection: any, id: any, select = []) =>
     });
   });
 
+  const findOne = (collection: any, query: any, select = []) =>
+    new Promise((resolve, reject) => {
+      collection.findOne(query, select, (err: any, data: any) => {
+        if (err) reject(err);
+        else resolve(data);
+      });
+    });
+
 /*
  * @description : count total number of records in a collection
  * @param  {obj} collection : mongoose instance of a collection
@@ -110,6 +118,7 @@ const dbService = {
   findById,
   count,
   findAll,
+  findOne
 };
 
 export default dbService;

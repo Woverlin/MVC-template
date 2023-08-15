@@ -1,30 +1,66 @@
-import { Request, Response } from "express";
-import User from "../../models/user";
-import validation from "../../utils/validateRequest";
-import dbService from "../../services/dbService";
-import { IResponse } from "../../interfaces/response";
+import bcrypt from "bcrypt";
+import User, { IUser } from "../models/user";
+import dbService from "../services/dbService";
+import { generateTokens } from "../utils/helper";
+import { IResponse } from "../interfaces/response";
+import variables from "../utils/variables";
+import { Request } from "express";
 
 const add = async (req: any, res: any) => {
   try {
     let params: any = { ...req.body };
-
-    console.log("====================================");
-    console.log("params", params);
-    console.log("====================================");
-
-    // log
-
-    // let validateRequest = validation.validateParamsWithJoi(
-    //   params,
-    //   userSchemaKey.schemaKeys);
-    // if (!validateRequest.isValid) {
-    //   return res.validationError({ message: `Invalid values in parameters, ${validateRequest.message}` });
-    // }
     params = new User(params);
     let user = await dbService.create(User, params);
     return res.success({ data: user });
   } catch (error: any) {
     return res.internalServerError({ message: error?.message });
+  }
+};
+
+const signUp = async (req: Request, res: any) => {
+  try {
+    const user: any = await dbService.findOne(User, { email: req.body.username });
+    if (user)
+      return res.failure({
+        message: "User already exist",
+      });
+    const salt = await bcrypt.genSalt(variables?.SALT);
+    const hashPassword = await bcrypt.hash(req.body.password, salt);
+
+    const params = new User({ ...req.body, password: hashPassword });
+
+    await dbService.create(User, params);
+    return res.success({ message: "Sign up successfully" });
+  } catch (error) {
+    res.failure({ message: error });
+  }
+};
+
+const login = async (req: any, res: any) => {
+  try {
+    let params: any = { ...req.body };
+
+    const user: any = await User.findOne({ username: req.body.username });
+
+    if (user) {
+      const verifiedPassword = await bcrypt.compare(params.password, user.password);
+
+      if (!verifiedPassword) {
+        return res.validationError({ message: "Invalid user name or password" });
+      }
+      const { accessToken, refreshToken } = await generateTokens(user);
+
+      delete user.password;
+      
+
+      return res.success({
+        data: { ...JSON.parse(JSON.stringify(user)), accessToken, refreshToken },
+      });
+    }
+
+    return res.failure({ message: "Invalid user name or password" });
+  } catch (error: any) {
+    return res.internalServerError({ message: error });
   }
 };
 
@@ -101,6 +137,8 @@ const add = async (req: any, res: any) => {
 
 export default {
   add,
+  login,
+  signUp,
   // update,
   // read,
   // remove,
